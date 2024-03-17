@@ -83,7 +83,7 @@ def test_chain_rule4() -> None:
     var1 = minitorch.Scalar(5)
     var2 = minitorch.Scalar(10)
 
-    y = Function2.apply(var1, var2)
+    y = Function2.apply(var1, var2) # x * y + x / 5 * 10 + 5 所以对x求导是10 + 1 = 11， 对y求导是5
 
     back = y.chain_rule(d_output=5)
     back = list(back)
