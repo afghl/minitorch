@@ -33,12 +33,18 @@ def neg(x: float) -> float:
 
 def lt(x: float, y: float) -> float:
     "$f(x) =$ 1.0 if x is less than y else 0.0"
-    return x < y
+    if x < y:
+        return 1.0
+    else:
+        return 0.0
 
 
 def eq(x: float, y: float) -> float:
     "$f(x) =$ 1.0 if x is equal to y else 0.0"
-    return x == y
+    if x == y:
+        return 1.0
+    else:
+        return 0.0
 
 
 def max(x: float, y: float) -> float:
@@ -81,7 +87,7 @@ def relu(x: float) -> float:
     if x > 0:
         return x
     else:
-        return 0
+        return 0.0
 
 
 EPS = 1e-6
