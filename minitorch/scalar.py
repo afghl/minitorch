@@ -178,6 +178,7 @@ class Scalar:
         """
         if d_output is None:
             d_output = 1.0
+
         backpropagate(self, d_output)
 
 

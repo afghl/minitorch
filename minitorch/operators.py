@@ -77,6 +77,10 @@ def sigmoid(x: float) -> float:
     else:
         return math.exp(x) / (1 + math.exp(x))
 
+def sigmoid_back(x: float, d: float) -> float:
+    r"If $f(x) = sigmoid$ compute $d \times f'(x)$"
+    return d * sigmoid(x) * (1 - sigmoid(x))
+
 
 def relu(x: float) -> float:
     """
