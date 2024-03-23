@@ -45,7 +45,8 @@ def index_to_position(index: Index, strides: Strides) -> int:
     return sum([s * i for s, i in zip(strides, index)])
 
 
-def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
+def to_index(ordinal: int, shape: Shape, out_index: OutIndex, strides: Optional[Strides] = None
+             ) -> None:
     """
     Convert an `ordinal` to an index in the `shape`.
     Should ensure that enumerating position 0 ... size of a
@@ -61,12 +62,26 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
     # for example:
     # ordinal: 21, shape: [2 3 2 2], out_index: [1 1 1 1]
     # ordinal: 22, shape: [2 3 2 2], out_index: [0 2 1 1]
-    remain = ordinal
-    for i in range(shape.shape[0]):
-        s = shape[i]
-        pos = remain % s
-        remain = remain // s
-        out_index[i] = pos
+    # remain = ordinal
+    # for i in range(shape.shape[0]):
+    #     s = shape[i]
+    #     pos = remain % s
+    #     remain = remain // s
+    #     out_index[i] = pos
+    if not isinstance(shape, np.ndarray):
+        shape = np.array(shape, dtype=np.int32)
+    dim, size = shape.size, int(prod(shape))
+    assert len(out_index) == dim, "out_index"  # TODO: convert to out_index.size
+    if ordinal < 0 or ordinal >= size:
+        raise IndexingError("Ordinal position out of bounds")
+    strides = np.array(strides_from_shape(tuple(shape))) if strides is None else strides
+    if not isinstance(strides, np.ndarray):
+        strides = np.array(strides, dtype=np.int32)
+    assert strides.size == dim, "strides and shape dims don't match"
+    for i in reversed(np.argsort(np.multiply(strides, shape)).tolist()):
+        stride = strides[i]
+        out_index[i] = ordinal // stride
+        ordinal %= stride
 
 
 def broadcast_index(
@@ -88,8 +103,13 @@ def broadcast_index(
     Returns:
         None
     """
-    # TODO: Implement for Task 2.2.
-    raise NotImplementedError('Need to implement for Task 2.2')
+    num_dims = shape.shape[0]
+    for i in range(1, num_dims + 1):
+        size = shape[-i]
+        if size == big_shape[-i]:
+            out_index[-i] = big_index[-i]
+        else:
+            out_index[-i] = 0
 
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
@@ -252,9 +272,14 @@ class TensorData:
         ), f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
         # storage, shape, strides
         # zip self.shape and order, and then sort by order
-        permute_shape = tuple([self.shape[i] for i in order])
-        permute_strides = tuple([self.strides[i] for i in order])
-        return TensorData(self._storage, permute_shape, permute_strides)
+        permute_shape = tuple([self.shape[int(i)] for i in order])
+        permute_strides = tuple([self.strides[int(i)] for i in order])
+        return TensorData(self._storage.copy(), permute_shape, permute_strides)
+        # return TensorData(
+        #     self._storage.copy(),
+        #     tuple(self.shape[int(i)] for i in order),
+        #     tuple(self.strides[int(i)] for i in order),
+        # )
 
     def to_string(self) -> str:
         s = ""

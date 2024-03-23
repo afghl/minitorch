@@ -74,11 +74,11 @@ class Tensor:
     name: str
 
     def __init__(
-        self,
-        v: TensorData,
-        back: Optional[History] = None,
-        name: Optional[str] = None,
-        backend: Optional[TensorBackend] = None,
+            self,
+            v: TensorData,
+            back: Optional[History] = None,
+            name: Optional[str] = None,
+            backend: Optional[TensorBackend] = None,
     ):
         global _tensor_count
         _tensor_count += 1
@@ -255,13 +255,13 @@ class Tensor:
 
     @staticmethod
     def make(
-        storage: Union[Storage, List[float]],
-        shape: UserShape,
-        strides: Optional[UserStrides] = None,
-        backend: Optional[TensorBackend] = None,
+            storage: Union[Storage, List[float]],
+            shape: UserShape,
+            strides: Optional[UserStrides] = None,
+            backend: Optional[TensorBackend] = None,
     ) -> Tensor:
         "Create a new tensor from data"
-        return Tensor(TensorData(storage, shape, strides), backend=backend)
+        return Tensor(TensorData(storage, shape, strides), back=History(), backend=backend)
 
     def expand(self, other: Tensor) -> Tensor:
         """

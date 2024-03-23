@@ -96,20 +96,14 @@ def backpropagate(variable: Variable, deriv: Any) -> None:
     # compute each derivative for each variable,
     # if variable is leaf node, set derivative
 
-    derivatives = {variable.unique_id: float(deriv)}
+    derivatives = {variable.unique_id: deriv}
     for var in topological_sort(variable):
         d = derivatives[var.unique_id]
         if var.is_leaf():
             var.accumulate_derivative(d)
             continue
         for pv, pd in var.chain_rule(d):
-            if pv.unique_id in derivatives:
-                derivatives[pv.unique_id] += pd
-            else:
-                derivatives[pv.unique_id] = pd
-
-
-
+            derivatives[pv.unique_id] = pd + derivatives.get(pv.unique_id, 0.0)
 
 
 @dataclass
