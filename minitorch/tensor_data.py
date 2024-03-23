@@ -42,9 +42,7 @@ def index_to_position(index: Index, strides: Strides) -> int:
     Returns:
         Position in storage
     """
-
-    # TODO: Implement for Task 2.1.
-    raise NotImplementedError('Need to implement for Task 2.1')
+    return sum([s * i for s, i in zip(strides, index)])
 
 
 def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
@@ -60,12 +58,19 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
         out_index : return index corresponding to position.
 
     """
-    # TODO: Implement for Task 2.1.
-    raise NotImplementedError('Need to implement for Task 2.1')
+    # for example:
+    # ordinal: 21, shape: [2 3 2 2], out_index: [1 1 1 1]
+    # ordinal: 22, shape: [2 3 2 2], out_index: [0 2 1 1]
+    remain = ordinal
+    for i in range(shape.shape[0]):
+        s = shape[i]
+        pos = remain % s
+        remain = remain // s
+        out_index[i] = pos
 
 
 def broadcast_index(
-    big_index: Index, big_shape: Shape, shape: Shape, out_index: OutIndex
+        big_index: Index, big_shape: Shape, shape: Shape, out_index: OutIndex
 ) -> None:
     """
     Convert a `big_index` into `big_shape` to a smaller `out_index`
@@ -123,10 +128,10 @@ class TensorData:
     dims: int
 
     def __init__(
-        self,
-        storage: Union[Sequence[float], Storage],
-        shape: UserShape,
-        strides: Optional[UserStrides] = None,
+            self,
+            storage: Union[Sequence[float], Storage],
+            shape: UserShape,
+            strides: Optional[UserStrides] = None,
     ):
         if isinstance(storage, np.ndarray):
             self._storage = storage
@@ -226,9 +231,11 @@ class TensorData:
         assert list(sorted(order)) == list(
             range(len(self.shape))
         ), f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
-
-        # TODO: Implement for Task 2.1.
-        raise NotImplementedError('Need to implement for Task 2.1')
+        # storage, shape, strides
+        # zip self.shape and order, and then sort by order
+        permute_shape = tuple([self.shape[i] for i in order])
+        permute_strides = tuple([self.strides[i] for i in order])
+        return TensorData(self._storage, permute_shape, permute_strides)
 
     def to_string(self) -> str:
         s = ""

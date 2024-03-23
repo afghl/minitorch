@@ -7,6 +7,7 @@ from minitorch import TensorData
 
 from .tensor_strategies import indices, tensor_data
 
+
 # ## Tasks 2.1
 
 # Check basic properties of layout and strides.
@@ -43,6 +44,23 @@ def test_layout_bad() -> None:
 @given(tensor_data())
 def test_enumeration(tensor_data: TensorData) -> None:
     "Test enumeration of tensor_datas."
+    indices = list(tensor_data.indices())
+
+    # Check that enough positions are enumerated.
+    assert len(indices) == tensor_data.size
+
+    # Check that enough positions are enumerated only once.
+    assert len(set(tensor_data.indices())) == len(indices)
+
+    # Check that all indices are within the shape.
+    for ind in tensor_data.indices():
+        for i, p in enumerate(ind):
+            assert p >= 0 and p < tensor_data.shape[i]
+
+
+@pytest.mark.task2_1
+@given(tensor_data(shape=(2, 3, 2, 2)))
+def test_to_index(tensor_data: TensorData) -> None:
     indices = list(tensor_data.indices())
 
     # Check that enough positions are enumerated.
