@@ -106,8 +106,27 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
     Raises:
         IndexingError : if cannot broadcast
     """
-    # TODO: Implement for Task 2.2.
-    raise NotImplementedError('Need to implement for Task 2.2')
+    if len(shape1) > len(shape2):
+        diff = len(shape1) - len(shape2)
+        shape2 = tuple([1] * diff + list(shape2))
+    elif len(shape2) > len(shape1):
+        diff = len(shape2) - len(shape1)
+        shape1 = tuple([1] * diff + list(shape1))
+
+    # rule 2: if dimensions unequal, 1s become other corresponding dim
+    new_shape1, new_shape2 = list(shape1), list(shape2)
+    for i, dim in enumerate(shape1):
+        if dim == 1:
+            new_shape1[i] = shape2[i]
+    for i, dim in enumerate(shape2):
+        if dim == 1:
+            new_shape2[i] = shape1[i]
+
+    # rule 3: if shapes still unequal, throw error
+    if new_shape1 != new_shape2:
+        raise IndexingError()
+
+    return tuple(new_shape1)
 
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
