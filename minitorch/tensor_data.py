@@ -275,11 +275,6 @@ class TensorData:
         permute_shape = tuple([self.shape[int(i)] for i in order])
         permute_strides = tuple([self.strides[int(i)] for i in order])
         return TensorData(self._storage.copy(), permute_shape, permute_strides)
-        # return TensorData(
-        #     self._storage.copy(),
-        #     tuple(self.shape[int(i)] for i in order),
-        #     tuple(self.strides[int(i)] for i in order),
-        # )
 
     def to_string(self) -> str:
         s = ""
